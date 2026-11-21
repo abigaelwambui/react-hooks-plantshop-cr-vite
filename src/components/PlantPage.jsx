@@ -8,15 +8,19 @@ function PlantPage() {
     const [plants, setPlants] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
 
-    // Fetch plants when the component loads
     useEffect(() => {
         fetch("http://localhost:6001/plants")
-            .then((response) => response.json())
-            .then((data) => setPlants(data))
-            .catch((error) => console.error(error));
+            .then((response) => {
+                console.log("Response:", response);
+                return response.json();
+            })
+            .then((data) => {
+                console.log("Fetched plants:", data);
+                setPlants(data);
+            })
+            .catch((error) => console.error("Fetch error:", error));
     }, []);
 
-    // Add a new plant
     function handleAddPlant(newPlant) {
         fetch("http://localhost:6001/plants", {
             method: "POST",
@@ -27,15 +31,10 @@ function PlantPage() {
         })
             .then((response) => response.json())
             .then((addedPlant) => {
-                setPlants((currentPlants) => [
-                    ...currentPlants,
-                    addedPlant,
-                ]);
-            })
-            .catch((error) => console.error(error));
+                setPlants((currentPlants) => [...currentPlants, addedPlant]);
+            });
     }
 
-    // Mark a plant as sold out
     function handleSoldOut(plantId) {
         setPlants((currentPlants) =>
             currentPlants.map((plant) =>
@@ -46,7 +45,6 @@ function PlantPage() {
         );
     }
 
-    // Search plants by name
     const filteredPlants = plants.filter((plant) =>
         plant.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -54,12 +52,10 @@ function PlantPage() {
     return (
         <main>
             <NewPlantForm onAddPlant={handleAddPlant} />
-
             <Search
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
             />
-
             <PlantList
                 plants={filteredPlants}
                 onSoldOut={handleSoldOut}
